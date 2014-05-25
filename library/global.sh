@@ -25,7 +25,7 @@ create_usb_filesystem() {
 create_usb_image() {
 	check_mounted
 	check_and_create_dirs
-	msg "Creating "$usb_image_size"Mb USB image	file"
+	msg "Creating $usb_image_size Mb USB image	file"
 
 	if [ -e "${tmp}/${imgfile}" ]; then
 		submsg "Removing previous image file"
@@ -72,7 +72,7 @@ config_setup() {
 }
 
 create_rw_md() {
-	if [ ! -e ${tmp}/=etc_files ]; then  
+	if [ ! -e ${tmp}/etc_files ]; then  
 		dd if=/dev/zero of=${tmp}/etc_files bs=1M count=10
 	fi
 	if (( check_mounted )); then
@@ -125,21 +125,20 @@ setup_base() {
 		fi
 	
 		if (( ! install_base )); then
-			err "Failed to install base packages"
+			die "Failed to install base packages"
 		fi
 	
 		if (( ! mount_dev )); then
-			err "Failed to mount dev"
+			die "Failed to mount dev"
 		fi
 
     	if (( ! config_setup )); then
-        	err "Failed to copy setup files"
+        	die "Failed to copy setup files"
 	    fi
 
     	if (( ! chroot_setup )); then
-        	err "Failed to copy setup files"
+        	die "Failed to copy setup files"
 	    fi
 
 	done
 }
-
