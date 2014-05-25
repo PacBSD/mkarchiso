@@ -8,7 +8,7 @@ submsg() {
 	printf "\033[1;35m  ->\033[0;0m ${mesg}\n" "$@"
 }
 
-(( ! check_are_we_root )) && die "We need to be root"
+(( check_are_we_root )) && die "We need to be root"
 
 create_usb_filesystem() {
 	submsg "Creating partition schemes"
