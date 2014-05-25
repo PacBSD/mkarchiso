@@ -15,14 +15,14 @@ arch=('i686' 'x86_64')
 
 base_package=(freebsd-configs freebsd-kernel freebsd-world pacman archbsd-keyring nano freebsd-init-color irssi)
 
-source "${libdir}"/checks || die "Couldn't load needed library"
-source "${libdir}"/global || die "Couldn't load needed library"
- 
 die() {
-	echo "$@"
-	exit 1
+    echo "$@"
+    exit 1
 }
 
+source "${libdir}"/checks.sh || die "Couldn't load needed library"
+source "${libdir}"/global.sh || die "Couldn't load needed library"
+ 
 show_help() {
 	cat << EOF
 	-u    size             Set USB image size in mb

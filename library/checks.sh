@@ -1,6 +1,10 @@
 is_mount_point() {
 	check=$1
-	[[ df ${check} | grep -q ${check} ]] && return 0
+	if (( df ${check} | grep -q ${check} )); then
+		return 0
+	else
+		return 1
+	fi
 }
 
 check_mounted() {
@@ -18,7 +22,7 @@ check_mounted() {
 }
 
 check_are_we_root() {
-	[[ "$UID" != "0" ]]; && return 1
+	[[ "$UID" != "0" ]] && return 1
 }
 
 check_usb() {
