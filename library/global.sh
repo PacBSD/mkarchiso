@@ -79,7 +79,7 @@ create_rw_md() {
 		mdconfig -a -t vnode -f etc_files -u 5
 		bsdlabel -w md5 auto
 		newfs md5
-		#remount devfs as it got cleared
+		# remount devfs as it got cleared
 		mount_dev
 		mount /dev/md5 ${iso_root}_${arch}/etc_rw
 	fi
@@ -93,12 +93,12 @@ chroot_setup() {
 	else
 		touch ${iso_root}_${arch}/etc_rw/{resolv.conf,hostid,host.conf}
 		mkdir -p ${iso_root}_${arch}/etc_rw/pacman.d/gnupg
-		echo "Welcome to ArchBSD" >  ${iso_root}_${arch}/etc_rw/motd
+		echo "Welcome to ArchBSD" > ${iso_root}_${arch}/etc_rw/motd
 
 		[[ -L "${iso_root}_${arch}"/etc/resolv.conf ]] && rm ${iso_root}_${arch}/etc/resolv.conf
 
 		chroot ${iso_root}_${arch} ln -Lws /etc_rw/resolv.conf /etc/resolv.conf
-		chroot ${iso_root)_${arch} ln -Ls  /etc_rw/pacman.d/gnupg /etc/pacman.d/gnupg
+		chroot ${iso_root}_${arch} ln -Ls  /etc_rw/pacman.d/gnupg /etc/pacman.d/gnupg
 		chroot ${iso_root}_${arch} pacman-key --init
 		chroot ${iso_root}_${arch} pacman-key --populate archbsd
 		chroot ${iso_root}_${arch} ln -Lws /etc_rw/motd /etc/motd
@@ -110,7 +110,7 @@ chroot_setup() {
 }
 
 setup_base() {
-	for arch in i686 x86_64; do
+	for arches in ${arch[@]}; do
 		msg "Installing base"
 		if (( check_usb )); then
 			create_usb_image
@@ -120,7 +120,7 @@ setup_base() {
 
 		submsg "Creating /var/lib/pacman"
 
-		if [ ! -d ${iso_root}_${arch} ]; then
+		if [ ! -d ${iso_root}_${arch}/var/lib/pacman ]; then
 			install -dm755 ${iso_root}_${arch}/var/lib/pacman
 		fi
 	
