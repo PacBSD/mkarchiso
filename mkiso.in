@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 mydir=`dirname "$(readlink -f $0)"`/library
-config=`dirname "$(readlink -f $0)"`/etc
+config=`dirname "$(readlink -f $0)"`/config
 libdir=${libdir:-${mydir}}
 tmp=/tmp/archbsd/
 date=`date +"%Y%m%d"`
@@ -39,11 +39,12 @@ while getopts c:a:u:h args; do
     c)
 		case $OPTARG in
 			usb)
-				gen_usb
+				create_iso=1
+				setup_base
 				;;
 			iso)
 				create_usb=1
-				gen_iso
+				create_base
 				;;
 			all)
 				gen_usb && gen_iso
@@ -54,7 +55,7 @@ while getopts c:a:u:h args; do
 		show_help
 		;;
     a)
-		arch=$OPTARG
+		arch=($OPTARG)
 		;;
   esac
 done

@@ -49,7 +49,7 @@ install_base() {
 }
 
 config_setup() {
-	if (( check_usb )); then
+	if ( check_usb ); then
 		cp ${files}/fstab.mem ${iso_root}_${arch}/etc/fstab
 	else
 		cp ${files}/fstab.iso ${iso_root}_${arch}/etc/fstab
@@ -86,7 +86,7 @@ create_rw_md() {
 }
 
 chroot_setup() {
-	if (( create_usb )); then
+	if ( check_usb ); then
 		chroot ${iso_root}_${arch} hostname ArchBSD
 		chroot ${iso_root}_${arch} pacman-key --init
 		chroot ${iso_root}_${arch} pacman-key --populate archbsd
@@ -112,7 +112,8 @@ chroot_setup() {
 setup_base() {
 	for arches in ${arch[@]}; do
 		msg "Installing base"
-		if (( check_usb )); then
+		check_and_create_dirs
+		if ( check_usb ); then
 			create_usb_image
 			submsg "Mounting USB image device to ${iso_root}_${arch}"
 			mount /dev/md1337s1a ${iso_root}_${arch}
@@ -124,7 +125,7 @@ setup_base() {
 			install -dm755 ${iso_root}_${arch}/var/lib/pacman
 		fi
 	
-		if (( ! install_base )); then
+		if ( ! install_base ); then
 			die "Failed to install base packages"
 		fi
 	
