@@ -31,7 +31,7 @@ show_help() {
 EOF
 }
 
-while getopts c:a:u: args; do
+while getopts c:a:u:h args; do
   case ${args} in
     u)
 		usb_image_size="$OPTARG"
