@@ -1,0 +1,19 @@
+#!/bin/sh
+# REQUIRE: mountcritlocal
+# BEFORE: hostid
+
+. /etc/rc.subr
+
+name="rw_populate"
+start_cmd="${name}_start"
+stop_cmd=":"
+
+rw_populate_start()
+{
+	cp /etc_files /tmp/
+	mdconfig -f /tmp/etc_files -u 999
+	mount /dev/md999 /etc_rw
+}
+
+load_rc_config $name
+run_rc_command "$1"

@@ -1,0 +1,85 @@
+ArchBSD Install
+
+Once the ArchBSD install cd is booted you may wish to change your keyboard layout by using the following command:
+kbdmap
+You can also use vidcontrol to change your console resolution, to see a list of available modes:
+
+	vidcontrol -i mode
+
+You can get a list of the mode numbers to use in setting the resolution to whatever the mode number matches:
+
+	vidcontrol MODE_XXX
+
+where XXX is the mode number.
+
+
+Setting up your disks
+
+The following example is for the simplest setup.
+To partition your disk with gpart the simplest way is the following:
+For sata drives the naming will be ada, while for IDE it will be da. Keep in mind this for the following commands:
+
+	Create the geom
+	gpart create -s gpt da0
+	gpart add -s 64k -t freebsd-boot da0
+
+Setup a swap:
+	
+	gpart add -s 1g -t freebsd-swap da0
+
+Setup a root partition.
+	gpart add -t freebsd-ufs da0
+	gpart bootcode -b /boot/pmbr -p /boot/gptboot -i 1 da0
+	newfs -U -j -L root /dev/da0p3
+	swapon /dev/da0p2
+
+Then finish by mounting the partitions to install:
+	mount /dev/da0p3 /mnt
+
+
+
+Installing base
+
+Once your disks are ready we can use pacstrap to install the ArchBSD base.
+At this point you will need the internet to fetch the packages. You can use dhclient for this:
+TIP: To find the available network devices, use ifconfig
+
+	dhclient device
+
+You can choose between FreeBSD-init and Openrc.
+FreeBSD init has more scripts such as automatic dhcp.
+
+And fetch the base with:
+	pacstrap /mnt base
+
+
+onfigure your system
+
+	chroot /mnt
+
+You'll need to manually setup your fstab at this point. Use either vi or ee for writing it.
+Example of a line for swap in fstab:
+
+	/dev/da0p2      none        swap   sw 0 0
+	/dev/da0p3      /           ufs    rw,async 1 1
+
+Setting up your timezone:
+
+	ln -s /usr/share/zoneinfo/Europe/London /etc/localtime
+
+Setting up your hostname:
+
+For openRC it's the following:
+
+	echo 'HOSTNAME="hostname"' > /etc/conf.d/hostname
+
+For FreeBSD-init it's:
+	
+	echo 'HOSTNAME="hostname"' > /etc/rc.conf
+
+Setup your password:
+
+	passwd
+
+
+That is all you'll be able to reboot into a working ArchBSD install.

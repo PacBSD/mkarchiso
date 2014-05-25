@@ -1,0 +1,60 @@
+#!/usr/bin/bash
+mydir=`dirname "$(readlink -f $0)"`/library
+config=`dirname "$(readlink -f $0)"`/etc
+libdir=${libdir:-${mydir}}
+tmp=/tmp/archbsd/
+date=`date +"%Y%m%d"`
+imgfile="ArchBSD-${arch}-${date}.img"
+isofile=imgfile="ArchBSD-${arch}-${date}.iso"
+iso_root="${tmp}/ArchBSD_iso_${arch}"
+
+#default arguements, can be overwrote
+usb_image_size=500
+create_usb=0
+arch=('i686' 'x86_64')
+
+base_package=(freebsd-configs freebsd-kernel freebsd-world pacman archbsd-keyring nano freebsd-init-color irssi)
+
+source "${libdir}"/checks || die "Couldn't load needed library"
+source "${libdir}"/global || die "Couldn't load needed library"
+ 
+die() {
+	echo "$@"
+	exit 1
+}
+
+show_help() {
+	cat << EOF
+	-u    size             Set USB image size in mb
+	-c    usb/iso/all      Create the images without cleaning
+	-a    arch             Create for specific arch
+EOF
+}
+
+while getopts c:a:u: args; do
+  case ${args} in
+    u)
+		usb_image_size="$OPTARG"
+		;;
+    c)
+		case $OPTARG in
+			usb)
+				gen_usb
+				;;
+			iso)
+				create_usb=1
+				gen_iso
+				;;
+			all)
+				gen_usb && gen_iso
+				;;
+		esac
+	      ;;
+    h)
+		show_help
+		;;
+    a)
+		arch=$OPTARG
+		;;
+  esac
+done
