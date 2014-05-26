@@ -41,7 +41,7 @@ mount_dev() {
 
 [[ -d ${chrootdir}/dev ]] && mount_dev
 
-[[ ! -e ${chrootdir}/etc/resolv.conf ]]	&& cp /etc/resolv.conf "$chrootdir/etc/resolv.conf"
+cp /etc/resolv.conf "$chrootdir/etc/resolv.conf"
 
 jail -c path=${chrootdir} ${jail_args[@]} command="$exec_command"
 
