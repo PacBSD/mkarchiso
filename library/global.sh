@@ -51,7 +51,9 @@ install_base() {
 config_setup() {
 	if ( check_usb ); then
 		cp ${files}/fstab.mem ${iso_root}_${arch}/etc/fstab
-	else
+	fi
+
+	if ( check_iso ); then
 		cp ${files}/fstab.iso ${iso_root}_${arch}/etc/fstab
 		mkdir -p ${iso_root}_${arch}/etc_rw
 		cp ${files}/rw_populate ${iso_root}_${arch}/etc/rc.d/rw_populate
@@ -72,15 +74,16 @@ config_setup() {
 }
 
 create_rw_md() {
-	if [ ! -e ${tmp}/etc_files ]; then  
-		dd if=/dev/zero of=${tmp}/etc_files bs=1M count=10
+	if [ -e ${tmp}/etc_files ]; then
+		rm ${tmp}/etc_files
 	fi
+	
+	dd if=/dev/zero of=${tmp}/etc_files bs=1M count=10
+
 	if ( check_mounted ); then
-		mdconfig -a -t vnode -f etc_files -u 5
+		mdconfig -a -t vnode -f ${tmp}/etc_files -u 5
 		bsdlabel -w md5 auto
 		newfs md5
-		# remount devfs as it got cleared
-		mount_dev
 		mount /dev/md5 ${iso_root}_${arch}/etc_rw
 	fi
 }
@@ -124,6 +127,10 @@ setup_base() {
 			fi
 			submsg "Mounting USB image device to ${iso_root}_${arch}"
 			mount /dev/md1337s1a ${iso_root}_${arch}
+		fi
+
+		if ( check_iso ); then
+			create_rw_md
 		fi
 
 		submsg "Creating /var/lib/pacman"

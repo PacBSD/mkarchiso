@@ -44,10 +44,10 @@ while getopts c:a:u:h args; do
 				;;
 			iso)
 				create_usb=1
-				create_base
+				setup_base
 				;;
 			all)
-				gen_usb && gen_iso
+				setup_base
 				;;
 		esac
 	      ;;

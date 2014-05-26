@@ -21,6 +21,10 @@ check_mounted() {
 		gpart destroy md1337
 		mdconfig -d -u 1337
 	fi
+
+	if [ -e /dev/md5 ]; then
+		mdconfig -d -u 5
+    fi
 }
 
 check_are_we_root() {
@@ -31,10 +35,22 @@ check_usb() {
 	[[ "$create_usb" == "0" ]] && return 0
 }
 
+check_iso() {
+    [[ "$create_iso" == "0" ]] && return 0
+}
+
 check_and_create_dirs() {
 	for dirs in ArchBSD_iso_i686 ArchBSD_iso_x86_64 ArchBSD_cache_i686 ArchBSD_cache_x86_64; do
 		if [ ! -d "${tmp}/${dirs}" ]; then
 			mkdir -p "${tmp}/${dirs}"
 		fi
 	done
+
+	if ( check_iso ); then
+		for dirs in ArchBSD_iso_i686/etc_rw ArchBSD_iso_x86_64/etc_rw; do
+	        if [ ! -d "${tmp}/${dirs}" ]; then
+	            mkdir -p "${tmp}/${dirs}"
+    	    fi
+		done
+	fi
 }			
