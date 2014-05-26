@@ -72,8 +72,8 @@ config_setup() {
 	echo 'hostid_enable="NO"' >> ${iso_root}_${arch}/etc/rc.conf
 	echo 'hostname="ArchBSD"' >> ${iso_root}_${arch}/etc/rc.conf
 
-	cp ${files}/pacstrap ${iso_root}_${arch}/usr/bin/pacstrap
-	chmod +x ${iso_root}_${arch}/usr/bin/pacstrap
+	cp ${files}/{arch-chroot,pacstrap} ${iso_root}_${arch}/usr/bin/
+	chmod +x ${iso_root}_${arch}/usr/bin/{pacstrap,arch-chroot}
 
 	cp ${files}/cshrc ${iso_root}_${arch}/root/.cshrc
 	cp ${files}/install.txt ${iso_root}_${arch}/root/install.txt
