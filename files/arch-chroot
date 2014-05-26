@@ -1,0 +1,51 @@
+#!/usr/bin/bash
+
+die() {
+    echo "$@"
+    exit 1
+}
+
+usage() {
+  cat <<EOF
+usage: ${0##*/} chroot-dir [command]
+
+    -h             Print this help message
+
+If 'command' is unspecified, ${0##*/} will launch /bin/sh.
+EOF
+}
+
+if [[ -z $1 || $1 = @(-h|--help) ]]; then
+  usage
+  exit $(( $# ? 0 : 1 ))
+fi
+
+(( EUID == 0 )) || die 'This script must be run with root privileges'
+chrootdir=$1
+shift
+commands="$@"
+
+if [ -n "$commands" ]; then
+	exec_command="$commands"
+else
+	exec_command="/bin/sh"
+fi
+
+[[ -d $chrootdir ]] || die "Can't create chroot on non-directory %s" "$chrootdir"
+
+jail_args=('host.hostname=chroot' 'ip6=inherit' 'ip4=inherit' 'allow.raw_sockets' 'allow.chflags' 'allow.mount')
+
+mount_dev() {
+	mount -t devfs devfs ${chrootdir}/dev
+}
+
+[[ -d ${chrootdir}/dev ]] && mount_dev
+
+[[ ! -e ${chrootdir}/etc/resolv.conf ]]	&& ln /etc/resolv.conf "$chrootdir/etc/resolv.conf"
+
+jail -c path=${chrootdir} ${jail_args[@]} command="$exec_command"
+
+if [ "$?" == "0" ]; then
+	rm "$chrootdir/etc/resolv.conf"
+	umount $chrootdir/dev
+fi
