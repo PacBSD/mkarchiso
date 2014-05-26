@@ -63,7 +63,8 @@ config_setup() {
 		mkdir -p ${iso_root}_${arch}/etc_rw
 		cp ${files}/rw_populate ${iso_root}_${arch}/etc/rc.d/rw_populate
 		chmod +x ${iso_root}_${arch}/etc/rc.d/rw_populate
-		echo 'rw_populate_enable="YES"' > ${iso_root}_${arch}/etc/rc.conf
+		echo 'tmpmfs="NO"' > ${iso_root}_${arch}/etc/rc.conf
+		echo 'rw_populate_enable="YES"' >> ${iso_root}_${arch}/etc/rc.conf
 		rm ${iso_root}_${arch}/etc/{motd,hostid,host.conf}
 	fi
 
