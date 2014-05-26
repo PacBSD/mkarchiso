@@ -112,8 +112,6 @@ chroot_setup() {
 		chroot ${iso_root}_${arch} ln -Lws /etc_rw/motd /etc/motd
 		chroot ${iso_root}_${arch} ln -Lws /etc_rw/hostid /etc/hostid
 		chroot ${iso_root}_${arch} ln -Lws /etc_rw/host.conf /etc/host.conf
-		# we need to sleep, as device reports as busy trying to umount instantly
-		sleep 2
 		check_mounted
 		cp ${tmp}/etc_files ${iso_root}_${arch}/
 	fi

@@ -8,7 +8,7 @@ is_mount_point() {
 }
 
 check_mounted() {
-	local potential_mounts=("${iso_root}_${arch}" "${iso_root}_${arch}/etc" "${iso_root}_${arch}/dev")
+	local potential_mounts=("${iso_root}_${arch}" "${iso_root}_${arch}/etc" "${iso_root}_${arch}/dev" "${iso_root}_${arch}/etc_rw")
 	msg "unmounted filesystems"
 	for mounts in ${potential_mounts[@]}; do
 		if ( is_mount_point ${mounts} ); then
@@ -19,10 +19,13 @@ check_mounted() {
 	if [ -e /dev/md1337 ]; then
 		msg "Destroying previous filesystems"
 		gpart destroy md1337
+		# Sleep so previous work completes and disks are removed normally
+		sleep 2
 		mdconfig -d -u 1337
 	fi
 
 	if [ -e /dev/md5 ]; then
+		sleep 2
 		mdconfig -d -u 5
 	fi
 }
