@@ -34,7 +34,7 @@ create_usb_image() {
 		dd if=/dev/zero of="${tmp}/${imgfile}" bs=1M count=${usb_image_size} &> /dev/null
 	fi
 
-	if [ -e /dev/md1337 ]; then
+	if [ ! -e /dev/md1337 ]; then
 		mdconfig -a -t vnode -f "${tmp}/${imgfile}" -u 1337	
 	fi
 }
@@ -75,7 +75,7 @@ create_rw_md() {
 	if [ ! -e ${tmp}/etc_files ]; then  
 		dd if=/dev/zero of=${tmp}/etc_files bs=1M count=10
 	fi
-	if (( check_mounted )); then
+	if ( check_mounted ); then
 		mdconfig -a -t vnode -f etc_files -u 5
 		bsdlabel -w md5 auto
 		newfs md5
@@ -110,11 +110,16 @@ chroot_setup() {
 }
 
 setup_base() {
-	for arches in ${arch[@]}; do
+	for arch in ${arches[@]}; do
+		imgfile="ArchBSD-${arch}-${date}.img"
+		isofile="ArchBSD-${arch}-${date}.iso"
 		msg "Installing base"
 		check_and_create_dirs
+
 		if ( check_usb ); then
-			create_usb_image
+			if ( create_usb_image ); then
+				create_usb_filesystem
+			fi
 			submsg "Mounting USB image device to ${iso_root}_${arch}"
 			mount /dev/md1337s1a ${iso_root}_${arch}
 		fi
@@ -129,15 +134,15 @@ setup_base() {
 			die "Failed to install base packages"
 		fi
 	
-		if (( ! mount_dev )); then
+		if ( ! mount_dev ); then
 			die "Failed to mount dev"
 		fi
 
-    	if (( ! config_setup )); then
+    	if ( ! config_setup ); then
         	die "Failed to copy setup files"
 	    fi
 
-    	if (( ! chroot_setup )); then
+    	if ( ! chroot_setup ); then
         	die "Failed to copy setup files"
 	    fi
 

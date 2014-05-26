@@ -2,16 +2,14 @@
 mydir=`dirname "$(readlink -f $0)"`/library
 config=`dirname "$(readlink -f $0)"`/config
 libdir=${libdir:-${mydir}}
-tmp=/tmp/archbsd/
+tmp=/tmp/archbsd
 date=`date +"%Y%m%d"`
-imgfile="ArchBSD-${arch}-${date}.img"
-isofile=imgfile="ArchBSD-${arch}-${date}.iso"
-iso_root="${tmp}/ArchBSD_iso_${arch}"
+iso_root="${tmp}/ArchBSD_iso"
 
 #default arguements, can be overwrote
 usb_image_size=500
 create_usb=0
-arch=('i686' 'x86_64')
+arches=('i686' 'x86_64')
 
 base_package=(freebsd-configs freebsd-kernel freebsd-world pacman archbsd-keyring nano freebsd-init-color irssi)
 
@@ -55,7 +53,7 @@ while getopts c:a:u:h args; do
 		show_help
 		;;
     a)
-		arch=($OPTARG)
+		arches=($OPTARG)
 		;;
   esac
 done
