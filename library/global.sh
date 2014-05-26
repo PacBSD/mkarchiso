@@ -12,11 +12,6 @@ submsg() {
 
 create_usb_filesystem() {
 	submsg "Creating partition schemes"
-	if ( gpart list md1337 | grep -q md1337s1 ); then
-		submsg "Destroying previous partitions"
-		gpart destroy -F md1337
-	fi
-
 	gpart create -s mbr md1337 || die "Failed to Create MBR"
 	gpart add -t freebsd md1337 || die "Failed to Create ufs partition"
 	gpart set -a active -i 1 md1337 || die "Failed to set active partition"
@@ -109,6 +104,8 @@ chroot_setup() {
 		chroot ${iso_root}_${arch} ln -Lws /etc_rw/motd /etc/motd
 		chroot ${iso_root}_${arch} ln -Lws /etc_rw/hostid /etc/hostid
 		chroot ${iso_root}_${arch} ln -Lws /etc_rw/host.conf /etc/host.conf
+		# we need to sleep, as device reports as busy trying to umount instantly
+		sleep 2
 		check_mounted
 		cp ${tmp}/etc_files ${iso_root}_${arch}/
 	fi
@@ -151,5 +148,8 @@ setup_base() {
         	die "Failed to copy setup files"
 	    fi
 
+		if ( ! check_mounted ); then
+			die "Failed to unmount file systems"
+		fi
 	done
 }
