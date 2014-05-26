@@ -39,6 +39,11 @@ create_usb_image() {
 	fi
 }
 
+gen_iso() {
+	msg "Generating ISO"
+	mkisofs -R -b boot/cdboot -no-emul-boot -V ArchBSD -o ArchBSD-${arch}-${date}.iso ${iso_root}_${arch}/
+}
+
 mount_dev() {
 	mount -t devfs devfs ${iso_root}_${arch}/dev
 }
@@ -154,6 +159,10 @@ setup_base() {
     	if ( ! chroot_setup ); then
         	die "Failed to copy setup files"
 	    fi
+
+		if ( check_iso ); then
+			gen_iso
+		fi
 
 		if ( ! check_mounted ); then
 			die "Failed to unmount file systems"
