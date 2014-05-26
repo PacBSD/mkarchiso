@@ -9,7 +9,7 @@ is_mount_point() {
 
 check_mounted() {
 	local potential_mounts=("${iso_root}_${arch}" "${iso_root}_${arch}/etc" "${iso_root}_${arch}/dev" "${iso_root}_${arch}/etc_rw")
-	msg "unmounted filesystems"
+	msg "Unmounting FileSystems"
 	for mounts in ${potential_mounts[@]}; do
 		if ( is_mount_point ${mounts} ); then
 			umount ${mounts}

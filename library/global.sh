@@ -31,7 +31,7 @@ create_usb_image() {
 		submsg "Removing previous image file"
 		rm "${tmp}/${imgfile}"
 	else 
-		dd if=/dev/zero of="${tmp}/${imgfile}" bs=1M count=${usb_image_size} &> /dev/null
+		dd if=/dev/zero of="${tmp}/${imgfile}" bs=1M count=${usb_image_size} > /dev/null 2>&1
 	fi
 
 	if [ ! -e /dev/md1337 ]; then
@@ -41,7 +41,7 @@ create_usb_image() {
 
 gen_iso() {
 	msg "Generating ISO"
-	mkisofs -R -b boot/cdboot -no-emul-boot -V ArchBSD -o ArchBSD-${arch}-${date}.iso ${iso_root}_${arch}/
+	mkisofs -quiet -R -b boot/cdboot -no-emul-boot -V ArchBSD -o ArchBSD-${arch}-${date}.iso ${iso_root}_${arch}/
 }
 
 mount_dev() {
@@ -83,7 +83,7 @@ create_rw_md() {
 		rm ${tmp}/etc_files
 	fi
 	
-	dd if=/dev/zero of=${tmp}/etc_files bs=1M count=10
+	dd if=/dev/zero of=${tmp}/etc_files bs=1M count=10 > /dev/null 2>&1
 
 	if ( check_mounted ); then
 		mdconfig -a -t vnode -f ${tmp}/etc_files -u 5
@@ -117,10 +117,19 @@ chroot_setup() {
 	fi
 }
 
+clean_up() {
+	if [ -d ${iso_root}_${arch} ]; then
+		rm -r ${iso_root}_${arch}/
+	fi
+}
+
 setup_base() {
 	for arch in ${arches[@]}; do
 		imgfile="ArchBSD-${arch}-${date}.img"
 		isofile="ArchBSD-${arch}-${date}.iso"
+		# clean up so we're not having left over files from previous runs
+		clean_up
+
 		msg "Installing base"
 		check_and_create_dirs
 
