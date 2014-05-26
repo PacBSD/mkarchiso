@@ -48,9 +48,9 @@ check_and_create_dirs() {
 
 	if ( check_iso ); then
 		for dirs in ArchBSD_iso_i686/etc_rw ArchBSD_iso_x86_64/etc_rw; do
-	        if [ ! -d "${tmp}/${dirs}" ]; then
-	            mkdir -p "${tmp}/${dirs}"
-    	    fi
+			if [ ! -d "${tmp}/${dirs}" ]; then
+				mkdir -p "${tmp}/${dirs}"
+			fi
 		done
 	fi
 }			
