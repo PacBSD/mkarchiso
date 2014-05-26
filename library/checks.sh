@@ -24,7 +24,7 @@ check_mounted() {
 
 	if [ -e /dev/md5 ]; then
 		mdconfig -d -u 5
-    fi
+	fi
 }
 
 check_are_we_root() {
