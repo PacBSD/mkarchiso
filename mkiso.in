@@ -7,7 +7,7 @@ date=`date +"%Y%m%d"`
 iso_root="${tmp}/ArchBSD_iso"
 
 #default arguements, can be overwrote
-usb_image_size=500
+usb_image_size=550
 create_usb=0
 arches=('i686' 'x86_64')
 

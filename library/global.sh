@@ -12,6 +12,11 @@ submsg() {
 
 create_usb_filesystem() {
 	submsg "Creating partition schemes"
+	if ( gpart list md1337 | grep -q md1337s1 ); then
+		submsg "Destroying previous partitions"
+		gpart destroy -F md1337
+	fi
+
 	gpart create -s mbr md1337 || die "Failed to Create MBR"
 	gpart add -t freebsd md1337 || die "Failed to Create ufs partition"
 	gpart set -a active -i 1 md1337 || die "Failed to set active partition"
