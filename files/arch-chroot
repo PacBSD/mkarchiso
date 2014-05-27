@@ -28,7 +28,7 @@ commands="$@"
 if [ -n "$commands" ]; then
 	exec_command="$commands"
 else
-	exec_command="/bin/sh"
+	exec_command="/usr/bin/bash"
 fi
 
 [[ -d $chrootdir ]] || die "Can't create chroot on non-directory %s" "$chrootdir"

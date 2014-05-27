@@ -55,7 +55,7 @@ And fetch the base with:
 
 onfigure your system
 
-	chroot /mnt
+	arch-chroot /mnt
 
 You'll need to manually setup your fstab at this point. Use either vi or ee for writing it.
 Example of a line for swap in fstab:
@@ -69,17 +69,13 @@ Setting up your timezone:
 
 Setting up your hostname:
 
-For openRC it's the following:
-
-	echo 'HOSTNAME="hostname"' > /etc/conf.d/hostname
-
-For FreeBSD-init it's:
-	
-	echo 'HOSTNAME="hostname"' > /etc/rc.conf
+	sysrc hostname="hostname" 
 
 Setup your password:
 
 	passwd
+
+
 
 
 That is all you'll be able to reboot into a working ArchBSD install.

@@ -29,7 +29,7 @@ track_mount() {
 
 api_fs_mount() {
   CHROOT_ACTIVE_MOUNTS=()
-  { df "$1" | grep -q "$1" || track_mount "$1" "$1" --bind; } &&
+  { df "$1" | grep -q "$1" || track_mount -t nullfs "$1" "$1" ;} &&
   track_mount -t procfs proc "$1/proc"
 }
 

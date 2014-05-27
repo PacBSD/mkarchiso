@@ -128,6 +128,8 @@ setup_base() {
 	for arch in ${arches[@]}; do
 		imgfile="ArchBSD-${arch}-${date}.img"
 		isofile="ArchBSD-${arch}-${date}.iso"
+		# make sure nothing is mounted first
+		check_mounted
 		# clean up so we're not having left over files from previous runs
 		clean_up
 
