@@ -162,13 +162,17 @@ setup_base() {
 			die "Failed to mount dev"
 		fi
 
-    	if ( ! config_setup ); then
-        	die "Failed to copy setup files"
-	    fi
+		if ( ! config_setup ); then
+			die "Failed to copy setup files"
+		fi
 
-    	if ( ! chroot_setup ); then
-        	die "Failed to copy setup files"
-	    fi
+		if ( ! chroot_setup ); then
+			die "Failed to copy setup files"
+		fi
+
+                if [ "${chroot_base}" == "1" ]; then
+			chroot ${iso_root}_${arch}
+		fi
 
 		if ( check_iso ); then
 			gen_iso

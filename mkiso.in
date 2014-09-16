@@ -28,6 +28,7 @@ show_help() {
 	-u    size             Set USB image size in mb
 	-c    usb/iso/all      Create the images without cleaning
 	-a    arch             Create for specific arch
+	-C                     Chroot into base before creating iso
 EOF
 }
 
@@ -56,6 +57,9 @@ while getopts c:a:u:h args; do
 		;;
     a)
 		arches=($OPTARG)
+		;;
+    C)
+		chroot_base="1"
 		;;
   esac
 done
