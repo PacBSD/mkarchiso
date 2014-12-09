@@ -16,8 +16,9 @@ all: $(SCRIPTFILES)
 mkarchiso: mkiso.in
 	sed -e 's@^libdir=.*@libdir=$(DATADIR)/library@' \
 		-e 's@^config=.*@config=$(DATADIR)/config@' \
-	    -e '/^mydir=.*library$$/d' \
+		-e '/^mydir=.*library$$/d' \
 		-e '/^mydir=.*config$$/d' \
+		-e 's@^files=.*@files=$(DATADIR)/files@' \
 	        mkiso.in \
 	      > mkarchiso
 

@@ -77,7 +77,7 @@ config_setup() {
 
 	cp ${files}/cshrc ${iso_root}_${arch}/root/.cshrc
 	cp ${files}/install.txt ${iso_root}_${arch}/root/install.txt
-        cp /home/amzo/absd-install/mkarchiso/pc-sysinstall ${iso_root}_${arch}/root/
+        cp ${files}/pc-sysinstall ${iso_root}_${arch}/root/
 }
 
 create_rw_md() {
