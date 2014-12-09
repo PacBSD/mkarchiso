@@ -13,7 +13,7 @@ create_usb=0
 create_iso=0
 arches=('i686' 'x86_64')
 
-base_package=(freebsd-configs freebsd-kernel freebsd-world pacman archbsd-keyring nano freebsd-init-color irssi)
+base_package=(freebsd-configs freebsd-kernel freebsd-world pacman archbsd-keyring nano openrc irssi)
 
 die() {
     echo "$@"
