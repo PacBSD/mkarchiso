@@ -12,8 +12,9 @@ usb_image_size=700
 create_usb=0
 create_iso=0
 arches=('i686' 'x86_64')
+init=('openrc')
 
-base_package=(freebsd-configs freebsd-kernel freebsd-world pacman archbsd-keyring nano openrc irssi)
+base_package=(freebsd-configs freebsd-kernel freebsd-world pacman archbsd-keyring nano irssi)
 
 die() {
     echo "$@"
@@ -29,6 +30,7 @@ show_help() {
 	-c    usb/iso/all      Create the images without cleaning
 	-a    arch             Create for specific arch
 	-C                     Chroot into base before creating iso
+	-i    init             Init system to use: openrc, freebsd-init
 EOF
 }
 
@@ -52,6 +54,9 @@ while getopts c:a:u:h args; do
 				;;
 		esac
 	      ;;
+    i)
+		init=($OPTARG)
+		;;			
     h)
 		show_help
 		;;
@@ -60,6 +65,9 @@ while getopts c:a:u:h args; do
 		;;
     C)
 		chroot_base="1"
+		;;
+    *)
+		show_help
 		;;
   esac
 done

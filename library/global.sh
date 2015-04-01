@@ -49,7 +49,7 @@ mount_dev() {
 }
 
 install_base() {
-    pacman -Syy --noconfirm ${base_package[@]} --config ${config}/pacman.conf.${arch} --cachedir ${tmp}/cache_${arch} \
+    pacman -Syy --noconfirm ${base_package[@]} ${init} --config ${config}/pacman.conf.${arch} --cachedir ${tmp}/cache_${arch} \
         -r ${iso_root}_${arch}
 }
 
@@ -61,16 +61,27 @@ config_setup() {
 	if ( check_iso ); then
 		cp ${files}/fstab.iso ${iso_root}_${arch}/etc/fstab
 		mkdir -p ${iso_root}_${arch}/etc_rw
-		cp ${files}/rw_populate ${iso_root}_${arch}/etc/rc.d/rw_populate
-		chmod +x ${iso_root}_${arch}/etc/rc.d/rw_populate
-		echo 'tmpmfs="NO"' > ${iso_root}_${arch}/etc/rc.conf
-		echo 'rw_populate_enable="YES"' >> ${iso_root}_${arch}/etc/rc.conf
+		if ( is_openrc ); then
+			cp ${files}/rw_populate.openrc ${iso_root}_${arch}/etc/init.d/rw_populate
+			chmod +x ${iso_root}_${arch}/etc/init.d/rw_populate
+			chroot ${iso_root}_${arch} /sbin/rc-update add rw_populate default
+		else
+			cp ${files}/rw_populate ${iso_root}_${arch}/etc/rc.d/rw_populate
+			chmod +x ${iso_root}_${arch}/etc/rc.d/rw_populate
+			echo 'tmpmfs="NO"' > ${iso_root}_${arch}/etc/rc.conf
+			echo 'rw_populate_enable="YES"' >> ${iso_root}_${arch}/etc/rc.conf
+		fi
+
 		rm ${iso_root}_${arch}/etc/{motd,hostid,host.conf}
 	fi
 
-	echo 'sendmail_enable="NONE"' >> ${iso_root}_${arch}/etc/rc.conf
-	echo 'hostid_enable="NO"' >> ${iso_root}_${arch}/etc/rc.conf
-	echo 'hostname="ArchBSD"' >> ${iso_root}_${arch}/etc/rc.conf
+	if ( is_openrc); then
+		echo 'hostname="ArchBSD"' > ${iso_root}_${arch}/etc/conf.d/hostname
+	else
+		echo 'sendmail_enable="NONE"' >> ${iso_root}_${arch}/etc/rc.conf
+		echo 'hostid_enable="NO"' >> ${iso_root}_${arch}/etc/rc.conf
+		echo 'hostname="ArchBSD"' >> ${iso_root}_${arch}/etc/rc.conf
+	fi
 
 	cp ${files}/{arch-chroot,pacstrap} ${iso_root}_${arch}/usr/bin/
 	chmod +x ${iso_root}_${arch}/usr/bin/{pacstrap,arch-chroot}
