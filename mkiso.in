@@ -22,6 +22,10 @@ die() {
     exit 1
 }
 
+if [ ! -x /usr/bin/mkisofs ]; then
+	die "Need mkisofs for iso creation"
+fi
+
 source "${libdir}"/checks.sh || die "Couldn't load needed library"
 source "${libdir}"/global.sh || die "Couldn't load needed library"
  
