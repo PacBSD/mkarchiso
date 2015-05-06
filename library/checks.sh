@@ -1,6 +1,6 @@
 is_mount_point() {
 	check=$1
-	if ( df ${check} | grep -q ${check} ); then 	
+	if ( df ${check} | grep -q ${check} ); then
 		return 0 
 	else
 		return 1
@@ -17,13 +17,13 @@ check_mounted() {
 		fi
 	done
 
-	if [ -e /dev/md1337 ]; then
-		mdconfig -d -u 1337
+	if [ -e /dev/md"${usb_md_device}" ]; then
+		mdconfig -d -u "${usb_md_device}"
 	fi
 
-	if [ -e /dev/md5 ]; then
+	if [ -e /dev/md"${iso_md_device}" ]; then
 		sync
-		mdconfig -d -u 5
+		mdconfig -d -u "${iso_md_device}"
 	fi
 }
 

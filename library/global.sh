@@ -10,14 +10,14 @@ submsg() {
 
 create_usb_filesystem() {
 	submsg "Creating partition schemes"
-	gpart create -s mbr md1337 || die "Failed to Create MBR"
-	gpart add -t freebsd md1337 || die "Failed to Create ufs partition"
-	gpart set -a active -i 1 md1337 || die "Failed to set active partition"
-	gpart create -s bsd md1337s1 || die "Failed to Create ufs partition"
-	gpart add -t freebsd-ufs md1337s1 || die "Failed to Create ufs partition"
-	newfs -U -j -L archbsd /dev/md1337s1a || die "Failed to Create ufs partition"
-	gpart bootcode -b /boot/boot0 md1337 || die "Failed to add bootcode"
-	gpart bootcode -b /boot/boot md1337s1 || die "Failed to add bootcode"
+	gpart create -s mbr md"${usb_md_device}" || die "Failed to Create MBR"
+	gpart add -t freebsd md"${usb_md_device}" || die "Failed to Create ufs partition"
+	gpart set -a active -i 1 md"${usb_md_device}" || die "Failed to set active partition"
+	gpart create -s bsd md"${usb_md_device}"s1 || die "Failed to Create ufs partition"
+	gpart add -t freebsd-ufs md"${usb_md_device}"s1 || die "Failed to Create ufs partition"
+	newfs -U -j -L archbsd /dev/md"${usb_md_device}"s1a || die "Failed to Create ufs partition"
+	gpart bootcode -b /boot/boot0 md"${usb_md_device}" || die "Failed to add bootcode"
+	gpart bootcode -b /boot/boot md"${usb_md_device}"s1 || die "Failed to add bootcode"
 }
 
 create_usb_image() {
@@ -32,8 +32,8 @@ create_usb_image() {
 		dd if=/dev/zero of="${tmp}/${imgfile}" bs=1M count=${usb_image_size} > /dev/null 2>&1
 	fi
 
-	if [ ! -e /dev/md1337 ]; then
-		mdconfig -a -t vnode -f "${tmp}/${imgfile}" -u 1337	
+	if [ ! -e /dev/md"${usb_md_device}" ]; then
+		mdconfig -a -t vnode -f "${tmp}/${imgfile}" -u "${usb_md_device}"	
 	fi
 }
 
@@ -85,10 +85,10 @@ create_rw_md() {
 	dd if=/dev/zero of=${tmp}/etc_files bs=1M count=10 > /dev/null 2>&1
 
 	if ( check_mounted ); then
-		mdconfig -a -t vnode -f ${tmp}/etc_files -u 5
-		bsdlabel -w md5 auto
-		newfs md5
-		mount /dev/md5 ${iso_root}_${arch}/etc_rw
+		mdconfig -a -t vnode -f ${tmp}/etc_files -u "${rw_md_device}"
+		bsdlabel -w md"${rw_md_device}" auto
+		newfs md"${rw_md_device}"
+		mount /dev/md"${rw_md_device}" ${iso_root}_${arch}/etc_rw
 	fi
 }
 
@@ -139,7 +139,7 @@ setup_base() {
 				create_usb_filesystem
 			fi
 			submsg "Mounting USB image device to ${iso_root}_${arch}"
-			mount /dev/md1337s1a ${iso_root}_${arch}
+			mount /dev/md"${usb_md_device}"s1a ${iso_root}_${arch}
 		fi
 
 		if ( check_iso ); then
