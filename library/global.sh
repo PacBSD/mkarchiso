@@ -8,8 +8,6 @@ submsg() {
 	printf "\033[1;35m  ->\033[0;0m ${mesg}\n" "$@"
 }
 
-(( check_are_we_root )) && die "We need to be root"
-
 create_usb_filesystem() {
 	submsg "Creating partition schemes"
 	gpart create -s mbr md1337 || die "Failed to Create MBR"
@@ -77,7 +75,6 @@ config_setup() {
 
 	cp ${files}/cshrc ${iso_root}_${arch}/root/.cshrc
 	cp ${files}/install.txt ${iso_root}_${arch}/root/install.txt
-        cp ${files}/pc-sysinstall ${iso_root}_${arch}/root/
 }
 
 create_rw_md() {
