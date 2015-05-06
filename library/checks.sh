@@ -7,6 +7,9 @@ is_mount_point() {
 	fi
 }
 
+is_openrc() {
+	[[ "$init" != "openrc" ]] && return 1
+}
 check_mounted() {
 	local potential_mounts=("${iso_root}_i686" "${iso_root}_x86_64" "${iso_root}_i686/etc" "${iso_root}_x86_64/etc"  "${iso_root}_i686/dev" 
 		"${iso_root}_x86_64/dev" "${iso_root}_i686/etc_rw" "${iso_root}_x86_64/etc_rw")
