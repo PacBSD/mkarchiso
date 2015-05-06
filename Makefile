@@ -10,7 +10,7 @@ LIBFILES    = library/*.sh
 DATAFILES   = files/*
 CONFIG      = config/*
 
-.PHONY: install install-program install-config clean
+.PHONY: install install-program clean
 all: $(SCRIPTFILES)
 
 mkarchiso: mkiso.in
@@ -22,7 +22,7 @@ mkarchiso: mkiso.in
 	        mkiso.in \
 	      > mkarchiso
 
-install: install-program install-config
+install: install-program
 
 install-program:
 	install -dm755                 "$(DESTDIR)$(BINDIR)"
