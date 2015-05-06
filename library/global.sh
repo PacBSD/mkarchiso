@@ -39,7 +39,7 @@ create_usb_image() {
 
 gen_iso() {
 	msg "Generating ISO"
-	mkisofs -quiet -R -b boot/cdboot -no-emul-boot -V ArchBSD -o ArchBSD-${arch}-${date}.iso ${iso_root}_${arch}/
+	mkisofs -quiet -R -b boot/cdboot -no-emul-boot -V ArchBSD -o /tmp/ArchBSD-${arch}-${date}.iso ${iso_root}_${arch}/
 }
 
 mount_dev() {

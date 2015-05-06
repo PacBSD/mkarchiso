@@ -24,7 +24,7 @@ die() {
 }
 
 if [ ! -x /usr/bin/mkisofs ]; then
-	die "Need mkisofs for iso creation"
+	die "Need mkisofs for iso creation: install dvd+rw-tools"
 fi
 
 source "${libdir}"/checks.sh || die "Couldn't load needed library"
