@@ -101,6 +101,20 @@ create_rw_md() {
 		newfs md"${rw_md_device}"
 		mount /dev/md"${rw_md_device}" ${iso_root}_${arch}/etc_rw
 	fi
+
+        if [ -e ${tmp}/var_files ]; then
+                rm ${tmp}/var_files
+        fi
+
+        dd if=/dev/zero of=${tmp}/var_files bs=1M count=10 > /dev/null 2>&1
+
+        if ( check_mounted ); then
+                mdconfig -a -t vnode -f ${tmp}/var_files -u "${var_md_device}"
+                bsdlabel -w md"${var_md_device}" auto
+                newfs md"${var_md_device}"
+                mount /dev/md"${var_md_device}" ${iso_root}_${arch}/var
+        fi
+
 }
 
 chroot_setup() {
@@ -124,6 +138,7 @@ chroot_setup() {
 		chroot ${iso_root}_${arch} ln -Lws /etc_rw/host.conf /etc/host.conf
 		check_mounted
 		cp ${tmp}/etc_files ${iso_root}_${arch}/
+		cp ${tmp}/var_files ${iso_root}_${arch}/
 	fi
 }
 
@@ -184,6 +199,7 @@ setup_base() {
 		fi
 
 		if ( check_iso ); then
+			echo 'kern.vt.fb.default_mode="1024x768"' >> ${iso_root}_${arch}/boot/loader.conf
 			gen_iso
 		fi
 

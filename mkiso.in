@@ -8,6 +8,7 @@ date=`date +"%Y%m%d"`
 iso_root="${tmp}/ArchBSD_iso"
 usb_md_device=$[ RANDOM % 100 ]
 rw_md_device=$[ RANDOM % 100 ]
+var_md_device=$[ RANDOM % 100 ]
 
 #default arguements, can be overwrote
 usb_image_size=700
@@ -40,7 +41,7 @@ show_help() {
 EOF
 }
 
-while getopts c:a:u:h args; do
+while getopts c:a:i:u:h args; do
   case ${args} in
     a)
                 arches="$OPTARG"
@@ -48,6 +49,9 @@ while getopts c:a:u:h args; do
     u)
 		usb_image_size="$OPTARG"
 		;;
+    i)
+                init="$OPTARG"
+                ;;
     c)
 		case $OPTARG in
 			usb)
@@ -63,9 +67,6 @@ while getopts c:a:u:h args; do
 				;;
 		esac
 	      ;;
-    i)
-		init=($OPTARG)
-		;;			
     h)
 		show_help
 		;;

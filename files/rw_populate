@@ -13,6 +13,11 @@ rw_populate_start()
 	cp /etc_files /tmp/
 	mdconfig -f /tmp/etc_files -u 999
 	mount /dev/md999 /etc_rw
+
+        cp /var_files /tmp/
+        mdconfig -f /tmp/var_files -u 998
+        mount /dev/md998 /var
+
 }
 
 load_rc_config $name
