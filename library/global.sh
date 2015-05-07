@@ -70,7 +70,11 @@ config_setup() {
 			echo 'rw_populate_enable="YES"' >> ${iso_root}_${arch}/etc/rc.conf
 		fi
 
-		rm ${iso_root}_${arch}/etc/{motd,hostid,host.conf}
+		for file in motd hostid host.conf; do
+			if [ -f ${iso_root}_${arch}/etc/${file} ]; then
+				rm ${iso_root}_${arch}/etc/${file}
+			fi
+		done
 	fi
 
 	if ( is_openrc); then

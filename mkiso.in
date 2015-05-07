@@ -44,6 +44,8 @@ EOF
 while getopts c:a:i:u:h args; do
   case ${args} in
     a)
+		#unset the array when passing to build only one arch
+		unset arches
                 arches="$OPTARG"
                 ;;
     u)

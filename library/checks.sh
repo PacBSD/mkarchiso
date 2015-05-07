@@ -21,6 +21,7 @@ check_mounted() {
 	msg "Unmounting FileSystems"
 	for mounts in ${potential_mounts[@]}; do
 		if ( is_mount_point ${mounts} ); then
+			fuser -ck ${mounts}
 			umount ${mounts}
 		fi
 	done
