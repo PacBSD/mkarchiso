@@ -1,1 +1,1 @@
-/dev/ufs/archbsd / ufs rw 0 0
+/dev/ufs/pacbsd / ufs rw 0 0

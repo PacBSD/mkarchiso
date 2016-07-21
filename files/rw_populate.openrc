@@ -1,0 +1,15 @@
+#!/sbin/openrc-run
+# Copyright (c) 2007-2009 Roy Marples <roy@marples.name>
+# Released under the 2-clause BSD license.
+
+start()
+{
+	cp /etc_files /tmp/
+	mdconfig -f /tmp/etc_files -u 999
+	mount /dev/md999 /etc_rw
+
+        cp /var_files /tmp/
+        mdconfig -f /tmp/var_files -u 998
+        mount /dev/md998 /var
+
+}

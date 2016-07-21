@@ -1,2 +1,2 @@
-/dev/iso9660/ArchBSD / cd9660 ro 0 0
+/dev/iso9660/PacBSD /var/iso/ cd9660 ro 0 0
 md /tmp mfs rw,-s32m 2 0
