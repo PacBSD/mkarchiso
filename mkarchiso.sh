@@ -8,11 +8,17 @@ init="openrc"
 
 iso_root="${tmpdir}/PacBSD-amd64"
 
+tmp_base="${tmpdir}/PacBSD-amd64-tmp"
+
 usb_image_size=1200
 
 imgfile="PacBSD-amd64-${date}.img"
 
 files="$(pwd)/files"
+
+packages=("bash"  "ca_root_nss"  "curl" "gawk" "gdbm" "gettext-runtime" "gmp" "gnupg" "gnutls" "gpgme" "gsed" "libassuan" "libffi" "libgcrypt"
+	  "libgpg-error" "libiconv" "libksba" "libsigsegv" "libtasn1" "libunistring" "mpfr" "ncurses" "nettle" "npth" "opentmpfiles" "p11-kit"
+	  "pacbsd-keyring" "pacman-mirrorlist" "perl" "pinentry" "pth" "sqlite" "pacman" "readline" "texinfo")
 
 die() {
 	echo "$@"
@@ -29,10 +35,21 @@ submsg() {
         printf "\033[1;35m  ->\033[0;0m ${mesg}\n" "$@"
 }
 
-if [[ ! -d  "${iso_root}" ]]; then
-        msg "Creating ${iso_root}"
-        mkdir -p "${iso_root}"
-fi
+remove_dir() {
+	_rmdir="${1}"
+	if [[ -d "${_rmdir}" ]]; then
+		msg "Removing ${_rmdir}"
+		rm -r "${_rmdir}"
+	fi
+}
+
+add_dir() {
+	_addir="${1}"
+	if [[ ! -d "${_addir}" ]]; then
+		msg "Creating ${_addir}"
+		mkdir -p "${_addir}"
+	fi
+}
 
 create_usb_image() {
         msg "Creating ${usb_image_size}Mb USB image file"
@@ -62,38 +79,45 @@ create_usb_filesystem() {
 }
 
 install_base() {
-	install -dm755 "${iso_root}/var/lib/pacman"
+	add_dir "${iso_root}/var/lib/pacman"
+	add_dir "${tmp_base}/var/lib/pacman"
 
-	pacman -Syy --noconfirm base ${init} --config "${files}/pacman.conf" \
+	pacman -Syydd freebsd-boot freebsd-kernel freebsd-world freebsd-configs -r "${tmp_base}"
+
+	while read file; do
+		if [[ -d "${tmp_base}/${file}" ]]; then
+			add_dir "${iso_root}/${file}"
+			continue
+		fi
+
+		cp -p "${tmp_base}/${file}" "${iso_root}/${file}"
+	done < "${files}/filelist"
+
+	pacman -Syydd --noconfirm "${packages[@]}" dhcpcd ${init} --config "${files}/pacman.conf" \
 		-r "${iso_root}"
 }
 
 create_iso_root() {
-        if [[ -e "${tmpdir}/mfsroot" ]]; then
-                rm "${tmpdir}/mfsroot"
-        fi
+	remove_dir "${tmpdir}/mfsroot"
 
 	submsg "Creating 40MB mfsroot"
         dd if=/dev/zero of="${tmpdir}/mfsroot" bs=1M count=40 > /dev/null 2>&1
 
         mdconfig -a -t vnode -f "${tmpdir}/mfsroot" -u "133"
 
-        mkdir -p "${tmpdir}/"/{boot,usr}
+	add_dir "${tmpdir}/boot"
+	add_dir "${tmpdir}/usr"
 
         newfs -U -j -L pacbsd /dev/md133
 
         mount -t ufs /dev/md133 ${iso_root}/
 
-	if [[ -d ${tmpdir}/boot ]]; then
-		rm -rf ${tmpdir}/boot
-	fi
+#	remove_dir "${tmpdir}/boot"
+#	remove_dir "${tmpdir}/usr"
 
-        if [[ -d ${tmpdir}/usr ]]; then
-                rm -rf ${tmpdir}/usr
-        fi
 
-	mkdir -p ${tmpdir}/{boot,usr}
-        mkdir -p ${iso_root}/{boot,usr}
+        add_dir "${iso_root}/boot"
+	add_dir "${iso_root}/usr"
 
         mount -t unionfs "${tmpdir}/boot" ${iso_root}/boot
 
@@ -104,10 +128,7 @@ create_iso_root() {
 
 
 mount_dev() {
-	if [[ ! -d ${iso_root}/dev ]]; then
-		mkdir -p ${iso_root}/dev
-	fi
-
+	add_dir "${iso_root}/dev"
         mount -t devfs devfs ${iso_root}/dev
 }
 
@@ -125,14 +146,22 @@ config_setup() {
                 cp ${files}/fstab.mem ${iso_root}/etc/fstab
         else
                 cp ${files}/fstab.iso ${iso_root}/etc/fstab
+	fi
 		cp ${files}/loader.conf ${iso_root}/boot/loader.conf
+		install -m755 ${files}/autoconfig ${iso_root}/etc/init.d/autoconfig
+		install -m755 "${files}/syscons" ${iso_root}/etc/conf.d/
+		install -m755 "${files}/ter-u32.fnt" ${iso_root}/usr/share/vt/fonts/
+		sed -i '' -e "32s/Pc/al.Pc/" ${iso_root}/etc/ttys
 		mkdir -p "${iso_root}/var/iso"
+                chroot ${iso_root} rc-update add autoconfig default
+		chroot ${iso_root} /usr/bin/pacman-key --init
+		chroot ${iso_root} /usr/bin/pacman-key --populate pacbsd
+
 		umount -f ${iso_root}/usr
 		umount -f ${iso_root}/boot
 		rm -rf ${iso_root}/{usr,boot}
 		ln -s /var/iso/usr ${iso_root}/usr
 		ln -s /var/iso/boot ${iso_root}/boot
-	fi
 }
 
 gen_iso() {
@@ -147,10 +176,12 @@ cleanup() {
 	mdconfig -d -u 133
 
 	rm -rf ${iso_root}
-	
 }
 
 for medium in iso; do
+	add_dir "${iso_root}"
+	add_dir "${tmp_base}"
+
 	if [[ "${medium}" == "usb" ]]; then
 		msg "Creating USB imagefile"
 		create_usb_image
@@ -166,7 +197,7 @@ for medium in iso; do
 	fi
 
 	mount_dev
-	
+
 	install_base
 
 	config_setup "${medium}"
@@ -174,9 +205,9 @@ for medium in iso; do
 	if [[ "${medium}" == "iso" ]]; then
 		umount ${iso_root}/boot
 		umount ${iso_root}/usr
-		
+
 		cleanup
-		mkdir -p "${iso_root}"
+		add_dir "${iso_root}"
 		cp -R "${tmpdir}/boot" "${iso_root}/boot"
 		cp -R "${tmpdir}/usr" "${iso_root}/usr"
 		cp -R "${tmpdir}/mfsroot" "${iso_root}/boot/mfsroot"

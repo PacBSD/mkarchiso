@@ -1,6 +1,6 @@
-ArchBSD Install
+PacBSD Install
 
-Once the ArchBSD install cd is booted you may wish to change your keyboard layout by using the following command:
+Once the PacBSD install cd is booted you may wish to change your keyboard layout by using the following command:
 kbdmap
 You can also use vidcontrol to change your console resolution, to see a list of available modes:
 
@@ -40,7 +40,7 @@ Then finish by mounting the partitions to install:
 
 Installing base
 
-Once your disks are ready we can use pacstrap to install the ArchBSD base.
+Once your disks are ready we can use pacstrap to install the PacBSD base.
 At this point you will need the internet to fetch the packages. You can use dhclient for this:
 TIP: To find the available network devices, use ifconfig
 
@@ -78,4 +78,4 @@ Setup your password:
 
 
 
-That is all you'll be able to reboot into a working ArchBSD install.
+That is all you'll be able to reboot into a working PacBSD install.

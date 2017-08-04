@@ -23,7 +23,7 @@ setenv LS_COLORS "no=00:fi=00:di=34:ln=01;31:pi=34;43:so=31;43:bd=30;43:cd=30;43
 setenv GREP_COLOR 31
 setenv ACK_COLOR_FILENAME red
 
-setenv TERM cons25
+setenv TERM xterm
 
 # UTF-8
 if (-X locale) then
@@ -76,10 +76,10 @@ set listlinks
 set listjobs
 
 # Show current dir.
-set prompt = " %{\e[0;31m%}%n %{\e[0;36m%}%~ %{\e[0;31m%}#%{\033[0m%} "
+set prompt = "%{\033[1;37m%}%T %{\033[1;32m%}%C%{\033[1;37m%} %#%{\033[0m%} "
 
 # Show date & hostname on right side
-set rprompt = "%{\e[0;34m%}%B%U%m%b%u:%{\e[0;35m%}%T%{\033[0m%} "
+#set rprompt = "%{\e[0;34m%}%B%U%m%b%u:%{\e[0;35m%}%T%{\033[0m%} "
 
 # Never print "DING!" as the time
 set noding
@@ -124,132 +124,3 @@ set fignore = (.o .pyc)
 		alias grep "grep --color"
 	endif
 
-# Override the tcsh builtins
-if (-x /usr/bin/nice) then
-	alias nice "/usr/bin/nice"
-else if (-x /bin/nice) then
-        alias nice "/bin/nice"
-endif
-
-if (-x /usr/bin/time) then
-	alias time "/usr/bin/time -h"
-endif
-
-# A few move aliases...
-alias cp "cp -i"
-alias mv "mv -i"
-alias make "nice -n 20 make"
-alias lman "groff -man -Tascii"
-alias j "jobs -l"
-
-if (-X xtermset) then
-	alias xt "xtermset -title"
-	alias black "xtermset -fg white -bg black"
-	alias white "xtermset -fg black -bg white"
-else if (-X xtermcontrol) then
-	alias xt "xtermcontrol --title"
-	alias black "xtermcontrol --fg=white --bg=black"
-	alias white "xtermcontrol --fg=black --bg=white"
-endif
-
-# Typos
-alias sl "ls"
-alias l	 "ls"
-alias c	 "cd"
-alias vo "vi"
-# I know ci is already a command, but not used often and it mangles files!
-alias ci "vi"
-alias grpe "grep"
-alias Grep "grep"
-
-alias helpcommand man
-
-#################################################
-# Keybinds
-#################################################
-# Delete
-bindkey ^[[3~ delete-char
-
-# Home
-bindkey ^[[H beginning-of-line
-bindkey ^[[1~ beginning-of-line
-
-# End
-bindkey ^[[F end-of-line
-bindkey ^[[4~ end-of-line
-
-# F1
-bindkey ^[[M run-help
-bindkey ^[[11~ run-help # Putty
-
-# Arrow keys
-bindkey -k up history-search-backward
-bindkey -k down history-search-forward
-
-# Insert
-bindkey ^[[L yank
-bindkey ^[[2 yank
-
-#################################################
-# Completion
-#################################################
-# Show directories only
-complete cd 'C/*/d/'
-complete rmdir 'C/*/d/'
-
-complete alias 'p/1/a/'
-complete unalias 'p/1/a/'
-complete unset 'p/1/s/'
-complete set 'p/1/s/'
-complete unsetenv 'p/1/e/'
-complete setenv 'p/1/e/'
-complete limit 'p/1/l/'
-complete bindkey 'C/*/b/'
-complete chgrp 'p/1/g/'
-complete chown 'p/1/u/' # TODO Support user:group completion
-complete uncomplete 'p/*/X/'
-
-#complete kill 'c/-/S/' 'p/1/(-)//'
-complete kill 'c/-/S/' 'n/*/`ps -axco pid= | sort`/'
-complete pkill 'c/-/S/' 'n/*/`ps -axco command= | sort -u`/'
-
-# Use available commands as arguments
-complete which 'p/1/c/'
-complete where 'p/1/c/'
-complete man 'p/1/c/'
-complete apropos 'p/1/c/'
-
-complete find \
-	'n/-name/f/' 'n/-newer/f/' 'n/-{,n}cpio/f/' \
-	'n/-exec/c/' 'n/-ok/c/' 'n/-user/u/' 'n/-group/g/' \
-	'n/-fstype/(nfs 4.2)/' 'n/-type/(b c d f l p s)/' \
-	'c/-/(name newer cpio ncpio exec ok user group fstype type atime \
-	ctime depth inum ls mtime nogroup nouser perm print prune \
-	size xdev and or)/' \
-	'p/*/d/'
-
-complete hg 'p/1/(add annotate clone commit diff export forget init log \
-	merge phase pull push remove serve status summary update)/'
-
-complete svn 'p/1/(add blame cat changelist checkout cleanup commit copy \
-	delete diff export help import info list lock log merge mergeinfo \
-	mkdir move propdel propedit propget proplist propset resolve \
-	resolved revert status switch unlock update)/'
-
-# Only list make targets
-complete make 'n@*@`make -pn | sed -n -E "/^[#_.\/[:blank:]]+/d; /=/d; s/[[:blank:]]*:.*//gp;"`@'
-
-# set up programs to complete only with files ending in certain extensions
-complete cc 'p/*/f:*.[cao]/'
-complete python 'p/*/f:*.py/'
-complete perl 'p/*/f:*.[pP][lL]/'
-#complete sh 'p/*/f:*.sh/'
-
-# set a list of hosts
-complete ssh 'p@1@`cut -d " " -f 1 ~/.ssh/known_hosts | sort -u`@'
-
-#  complete [command [word/pattern/list[:select]/[[suffix]/] ...]] (+)
-	complete sysctl 'n/*/`sysctl -Na`/'
-	complete service 'n/*/`service -l`/'
-
-	complete pkg_delete 'c/-/(i v D n p d f G x X r)/' 'n@*@`/bin/ls /var/db/pkg`@'
