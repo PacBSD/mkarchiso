@@ -1,0 +1,45 @@
+#!/sbin/openrc-run
+
+depend() {
+	before net
+	provide net
+}
+
+detect_netdevices() {
+        
+	for dev in $(ifconfig -l); do
+		n="$(basename $dev)"
+		case "$n" in
+		lo|sit0|lo?)
+			continue 
+			;;
+		*) 
+			net_device="$n"
+			;;		
+		esac
+	done
+}
+
+start() {
+	ebegin "Starting autoconfig"
+
+	detect_netdevices
+
+	if [ -n "${net_device}" ]
+	then
+		einfo "Running dhclient on detected $net_device interface ..."
+		if [ -f /var/run/dhclient."$net_device".pid ]
+		then
+			kill $(cat /var/run/dhclient."$net_device".pid)
+			sleep 2
+		fi
+
+		dhclient -b -q $net_device
+	else
+		ewarn "No Network device auto detected ..."
+	fi
+}
+
+# vim: ts=4
+
+
